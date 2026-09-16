@@ -1,27 +1,39 @@
-
 import streamlit as st
+import requests
+import urllib.parse
 
 st.set_page_config(page_title="ItsYourBouy AI", page_icon="🔥")
 st.title("ItsYourBouy Botshelo AI")
 st.write("It Helps With Everything - Kimberley")
 
+if "chat" not in st.session_state:
+    st.session_state.chat = []
+
 q = st.text_input("Ask me anything:")
 
-if st.button("Ask"):
-    if not q:
-        st.write("Type something Bouy!")
+if st.button("Ask") and q:
+    st.session_state.chat.append(("You", q))
+    
+    # Ask free AI
+    prompt = urllib.parse.quote(f"You are ItsYourBouy Botshelo AI from Kimberley, friendly and helpful, like a cool homie. Answer this: {q}")
+    try:
+        r = requests.get(f"https://text.pollinations.ai/{prompt}", timeout=30)
+        ans = r.text
+    except:
+        # fallback if internet slow
+        if "+" in q or "-" in q or "*" in q or "/" in q:
+            try:
+                ans = f"Yo Bouy! {q} = {eval(q)} 🔥"
+            except:
+                ans = "My brain is loading Bouy, ask me again!"
+        else:
+            ans = f"Yo Bouy! You said '{q}' - I'm your AI from Kimberley and I got you! Ask me anything - maths, school, business, life."
+
+    st.session_state.chat.append(("Bouy AI", ans))
+
+# Show chat
+for who, msg in reversed(st.session_state.chat):
+    if who == "You":
+        st.write(f"**{who}:** {msg}")
     else:
-        q_low = q.lower()
-        try:
-            # If it's math like 1+1, calculate it
-            if any(c in q for c in "+-*/()"):
-                ans = eval(q)
-                st.success(f"Yo Bouy! {q} = {ans} 🔥")
-            elif "hello" in q_low or "hi" in q_low:
-                st.success("Hey Bouy! What's good? I'm your AI from Kimberley, ready to help!")
-            elif "who are you" in q_low:
-                st.success("I am ItsYourBouy — Botshelo's AI. Built in Kimberley to help with everything!")
-            else:
-                st.success(f"You asked: '{q}'\n\nI'm Bouy AI! I got you. For now I do math perfect, and chat. Tell me more about '{q}' and I'll help you out, my dawg!")
-        except:
-            st.success(f"You asked: {q}. Answer is 2 if you asked 1+1! I'm learning Bouy, ask me again!")
+        st.success(f"**{who}:** {msg}")
