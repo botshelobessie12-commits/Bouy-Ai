@@ -1,38 +1,28 @@
-import streamlit as st, requests, urllib.parse
+import streamlit as st
 from PIL import Image
+import os
 
-st.set_page_config(page_title="Bouy AI", page_icon="🔥")
+logo_path = "logo.png" if os.path.exists("logo.png") else None
 
-# Try to load logo with whatever name you have
-logo_found = False
-for name in ["logo.png", "logo.jpg", "IMG-20260917-WA7650.jpg", "IMG-20260917-WA7650.jpeg"]:
-    try:
-        logo = Image.open(name)
-        st.image(logo, width=200)
-        logo_found = True
-        break
-    except:
-        pass
+try:
+    icon = Image.open(logo_path) if logo_path else "🔥"
+except:
+    icon = "🔥"
 
-st.title("BOUY AI")
-st.caption("ItsYourBouy AI - It Helps With Everything | Kimberley, SA 🔥")
+st.set_page_config(page_title="BOUY AI", page_icon=icon, layout="centered")
 
-if "chat" not in st.session_state:
-    st.session_state.chat = []
+if logo_path:
+    st.image(logo_path, width=130)
+
+st.markdown("# BOUY AI")
+st.markdown("ItsYourBouy AI - It Helps With Everything | Kimberley, SA 🔥")
 
 q = st.text_input("Ask Bouy AI anything:")
-if st.button("Ask 🔥") and q:
-    st.session_state.chat.append(("You", q))
-    prompt = urllib.parse.quote(f"You are Bouy AI, made by Botshelo from Kimberley, cool, helpful, like ItsYourBouy. Answer in friendly style: {q}")
-    try:
-        r = requests.get(f"https://text.pollinations.ai/{prompt}", timeout=30)
-        ans = r.text
-    except:
-        ans = "Eish network slow Bouy, try again!"
-    st.session_state.chat.append(("Bouy AI", ans))
-
-for who, msg in reversed(st.session_state.chat):
-    if who == "You":
-        st.write(f"**{who}:** {msg}")
+if st.button("Ask 🔥"):
+    if q:
+        st.success(f"Bouy AI: You asked '{q}' - I got you!")
     else:
-        st.success(f"**{who}:** {msg}")
+        st.warning("Type something!")
+
+st.markdown("---")
+st.caption("Built by ItsYourBouy | Kimberley")
