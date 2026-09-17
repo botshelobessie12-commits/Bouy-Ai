@@ -1,43 +1,34 @@
-import streamlit as st
-import requests
-import urllib.parse
+import streamlit as st, requests, urllib.parse
 from PIL import Image
 
-# --- LOGO ---
-try:
-    logo = Image.open("logo.png")
-    st.set_page_config(page_title="Bouy AI", page_icon=logo)
-except:
-    st.set_page_config(page_title="Bouy AI", page_icon="🔥")
+st.set_page_config(page_title="Bouy AI", page_icon="🔥")
 
-# Show logos if they exist
-try:
-    st.image("logo_full.png", width=300)
-except:
+# Try to load logo with whatever name you have
+logo_found = False
+for name in ["logo.png", "logo.jpg", "IMG-20260917-WA7650.jpg", "IMG-20260917-WA7650.jpeg"]:
     try:
-        st.image("logo.png", width=150)
+        logo = Image.open(name)
+        st.image(logo, width=200)
+        logo_found = True
+        break
     except:
         pass
 
-st.title("ItsYourBouy Botshelo AI")
-st.write("It Helps With Everything - Kimberley 🔥")
+st.title("BOUY AI")
+st.caption("ItsYourBouy AI - It Helps With Everything | Kimberley, SA 🔥")
 
-# --- AI CHAT ---
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
-q = st.text_input("Ask me anything, Bouy:")
-
+q = st.text_input("Ask Bouy AI anything:")
 if st.button("Ask 🔥") and q:
     st.session_state.chat.append(("You", q))
-    
-    prompt = urllib.parse.quote(f"You are ItsYourBouy AI, a cool helpful AI from Kimberley, South Africa, made by Botshelo. Answer friendly: {q}")
+    prompt = urllib.parse.quote(f"You are Bouy AI, made by Botshelo from Kimberley, cool, helpful, like ItsYourBouy. Answer in friendly style: {q}")
     try:
         r = requests.get(f"https://text.pollinations.ai/{prompt}", timeout=30)
         ans = r.text
     except:
-        ans = "Eish, signal is slow Bouy, ask me again!"
-
+        ans = "Eish network slow Bouy, try again!"
     st.session_state.chat.append(("Bouy AI", ans))
 
 for who, msg in reversed(st.session_state.chat):
